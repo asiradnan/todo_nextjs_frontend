@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,8 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 const API_BASE_URL = 'https://todofastapi.asiradnan.com';
 
-export default function ResetPassword() {
+
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -42,7 +43,6 @@ export default function ResetPassword() {
         token: token,
         new_password: passwords.password
       });
-      console.log(response.data);
       toast.success('Password reset successful');
       router.push('/');
     } catch (error) {
@@ -53,13 +53,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Todo App</h1>
-        <ThemeToggle />
-      </div>
-      <div className="flex-grow flex items-center justify-center">
-        <Card className="w-full max-w-md p-6">
+    <Card className="w-full max-w-md p-6">
           <h2 className="text-2xl font-semibold text-center mb-6">Reset Password</h2>
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="space-y-2">
@@ -97,6 +91,22 @@ export default function ResetPassword() {
             </Button>
           </form>
         </Card>
+  );
+}
+
+
+
+export default function ResetPassword() {
+  return (
+    <div className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
+      <div className="flex justify-between items-center">
+        <h1 className="text-4xl font-bold">Todo App</h1>
+        <ThemeToggle />
+      </div>
+      <div className="flex-grow flex items-center justify-center">
+        <Suspense fallback={<div>Loading...</div>}>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
