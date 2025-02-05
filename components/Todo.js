@@ -10,8 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from 'sonner';
 import { format } from "date-fns";
-import TimePickerDemo  from '@/components/TimePicker.js';  
-import { PlusCircle, LogOut, CalendarIcon, UserRound } from 'lucide-react';
+import TimePickerDemo from '@/components/TimePicker.js';  
+import { PlusCircle, LogOut, CalendarIcon, UserRound, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -21,10 +21,10 @@ export default function TodoList({ onLogout }) {
   const [newTodo, setNewTodo] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
-
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState('active');
 
   const getAuthHeader = () => ({
     headers: {
@@ -34,7 +34,7 @@ export default function TodoList({ onLogout }) {
 
   const handleApiError = async (error) => {
     if (error.response?.status === 401) {
-      const response = await axios.post("https://todofastapi.asiradnan.com/refresh_token",
+      const response = await axios.post(`${API_BASE_URL}/refresh_token`,
         { refresh_token: localStorage.getItem('refresh_token') });
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
@@ -56,6 +56,22 @@ export default function TodoList({ onLogout }) {
       setLoading(false);
     }
   };
+
+  const deleteAllCompletedTasks = async () => {
+    if (actionLoading || !completedTodos.length) return;
+    
+    setActionLoading(true);
+    try {
+      axios.delete(`${API_BASE_URL}/delete_all_completed`,getAuthHeader())
+      await fetchTodos();
+      toast.success('All completed tasks deleted successfully');
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
 
   const addTodo = async (e) => {
     e.preventDefault();
@@ -113,16 +129,15 @@ export default function TodoList({ onLogout }) {
       setActionLoading(false);
     }
   };
+
   const editTodo = async (id, updates) => {
     setActionLoading(true);
     try {
-      console.log(updates)
-      const response = await axios.put(
+      await axios.put(
         `${API_BASE_URL}/edit_task/${id}`,
         updates,
         getAuthHeader()
       );
-      console.log(response.data);
       fetchTodos();
       toast.success('Task updated successfully');
     } catch (error) {
@@ -136,9 +151,9 @@ export default function TodoList({ onLogout }) {
     localStorage.removeItem('access_token');
     onLogout();
   };
+
   const router = useRouter();
   const handleProfileClick = () => {
-    
     router.push('/profile');
   };
 
@@ -151,20 +166,20 @@ export default function TodoList({ onLogout }) {
   }
 
   return (
-    <Card className="max-w-2xl mx-auto p-4 pb-8">
-      <div className="flex justify-between mb-2">
-  <Button variant="ghost" onClick={handleProfileClick}>
-    Profile
-    <UserRound className="h-5 w-5 ml-2" />
-  </Button>
-  <Button variant="ghost" onClick={handleLogout}>
-    <LogOut className="h-5 w-5 mr-2" />
-    Logout
-  </Button>
-</div>
+    <Card className="w-full max-w-2xl mx-auto p-2 sm:p-4 pb-8">
+      <div className="flex justify-between mb-2 flex-wrap gap-2">
+        <Button variant="ghost" onClick={handleProfileClick} className="text-sm sm:text-base">
+          Profile
+          <UserRound className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+        </Button>
+        <Button variant="ghost" onClick={handleLogout} className="text-sm sm:text-base">
+          <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          Logout
+        </Button>
+      </div>
 
       <form onSubmit={addTodo} className="flex flex-col gap-2 mb-6">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             type="text"
             value={newTodo}
@@ -174,42 +189,50 @@ export default function TodoList({ onLogout }) {
             disabled={actionLoading}
             required
           />
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={`w-32 justify-start text-left font-normal ${!dueDate && "text-muted-foreground"}`}
-                disabled={actionLoading}
-              >
-                <CalendarIcon className="mr-1 h-4 w-4" />
-                {dueDate ? new Date(dueDate).toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric'
-                }) : <span>Pick date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={dueDate ? new Date(dueDate) : undefined}
-                onSelect={(date) => setDueDate(date ? format(date, "yyyy-MM-dd") : "")}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          <TimePickerDemo
-            value={dueTime}
-            onChange={setDueTime}
-            width='25'
-          />
-          <Button type="submit" disabled={actionLoading}>
-            <PlusCircle className="h-5 w-5 mr-2" />
+          <div className="flex gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={`flex-1 sm:w-32 justify-start text-left font-normal ${!dueDate && "text-muted-foreground"}`}
+                  disabled={actionLoading}
+                >
+                  <CalendarIcon className="mr-1 h-4 w-4" />
+                  {dueDate ? new Date(dueDate).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                  }) : <span>Date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dueDate ? new Date(dueDate) : undefined}
+                  onSelect={(date) => setDueDate(date ? format(date, "yyyy-MM-dd") : "")}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <TimePickerDemo
+              value={dueTime}
+              onChange={setDueTime}
+              width='25'
+            />
+          </div>
+          <Button type="submit" disabled={actionLoading} className="w-full sm:w-auto">
+            <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             Add Task
           </Button>
         </div>
       </form>
 
-      <Tabs defaultValue="active" className="w-full">
+      
+
+      <Tabs 
+        defaultValue="active" 
+        className="w-full"
+        onValueChange={setCurrentTab}
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">
             Active ({activeTodos.length})
@@ -218,6 +241,19 @@ export default function TodoList({ onLogout }) {
             Completed ({completedTodos.length})
           </TabsTrigger>
         </TabsList>
+        {currentTab === 'completed' && completedTodos.length > 0 && (
+          <div className="flex justify-end items-center m-2">
+          <Button 
+            onClick={deleteAllCompletedTasks} 
+            disabled={actionLoading || !completedTodos.length}
+            variant="outline"
+            className="w-full sm:w-auto text-destructive hover:bg-destructive hover:text-destructive-foreground"
+          >
+            <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+            Delete All Completed Tasks
+          </Button>
+        </div>
+        )}
         <TabsContent value="active" className="space-y-4">
           {activeTodos.length === 0 ? (
             <p className="text-center text-muted-foreground">No active tasks</p>
@@ -228,6 +264,7 @@ export default function TodoList({ onLogout }) {
                 todo={todo}
                 onToggle={toggleTodo}
                 onDelete={deleteTodo}
+                onEdit={editTodo}
               />
             ))
           )}
@@ -238,12 +275,12 @@ export default function TodoList({ onLogout }) {
           ) : (
             completedTodos.map(todo => (
               <TodoItem
-  key={todo.id}
-  todo={todo}
-  onToggle={toggleTodo}
-  onDelete={deleteTodo}
-  onEdit={editTodo}
-/>
+                key={todo.id}
+                todo={todo}
+                onToggle={toggleTodo}
+                onDelete={deleteTodo}
+                onEdit={editTodo}
+              />
             ))
           )}
         </TabsContent>
