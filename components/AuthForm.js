@@ -34,14 +34,13 @@ export default function AuthForm({ onAuthSuccess }) {
         toast.success('Logged in successfully!')
       }
       else{
+        if (formData.email === '') formData.email = null
         const response = await axios.post("https://todofastapi.asiradnan.com/create_account", formData);
+        toast.success('Account created successfully!')
+        setIsLogin(true)
       }
-      
-      
-      toast.success(isLogin ? 'Logged in successfully!' : 'Account created successfully!');
-      onAuthSuccess(response.data.user);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Authentication failed');
+      toast.error(error.response?.data?.detail || 'Authentication failed');
     }
   };
 
@@ -51,15 +50,6 @@ export default function AuthForm({ onAuthSuccess }) {
         {isLogin ? 'Login' : 'Sign Up'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {!isLogin && (
-          <Input
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-          />
-        )}
         <Input
           type="text"
           placeholder="Username"
@@ -67,6 +57,14 @@ export default function AuthForm({ onAuthSuccess }) {
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           required
         />
+        {!isLogin && (
+          <Input
+            type="email"
+            placeholder="Email (optional)"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+        )}
         <Input
           type="password"
           placeholder="Password"
