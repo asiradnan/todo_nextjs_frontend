@@ -3,36 +3,47 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Clock } from 'lucide-react';
-
-
+import { Clock, Trash2 } from 'lucide-react';
 
 const TimePickerDemo = ({ value, onChange, width }) => {
     const [hours, setHours] = useState(() => {
-      if (!value) return 12;
+      if (!value) return undefined;
       const time = new Date(`1970-01-01T${value}`);
       return time.getHours() % 12 || 12;
     });
   
     const [minutes, setMinutes] = useState(() => {
-      if (!value) return 0;
+      if (!value) return undefined;
       return new Date(`1970-01-01T${value}`).getMinutes();
     });
   
     const [period, setPeriod] = useState(() => {
-      if (!value) return 'AM';
+      if (!value) return undefined;
       return new Date(`1970-01-01T${value}`).getHours() >= 12 ? 'PM' : 'AM';
     });
   
     const [view, setView] = useState('hours'); // 'hours' or 'minutes'
   
     useEffect(() => {
-      const formattedHours = period === 'PM' && hours !== 12
-        ? hours + 12
-        : (period === 'AM' && hours === 12 ? 0 : hours);
-      const timeString = `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-      onChange(timeString);
+      // Only format and send time if all values are defined
+      if (hours !== undefined && minutes !== undefined && period !== undefined) {
+        const formattedHours = period === 'PM' && hours !== 12
+          ? hours + 12
+          : (period === 'AM' && hours === 12 ? 0 : hours);
+        const timeString = `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        onChange(timeString);
+      } else {
+        // If any value is undefined, send null or empty string
+        onChange(null);
+      }
     }, [hours, minutes, period]);
+
+    const handleClearTime = () => {
+      setHours(undefined);
+      setMinutes(undefined);
+      setPeriod(undefined);
+      onChange(null);
+    };
   
     const renderClockFace = () => {
       if (view === 'hours') {
@@ -58,6 +69,8 @@ const TimePickerDemo = ({ value, onChange, width }) => {
               onClick={() => {
                 setHours(i);
                 setView('minutes');
+                // Set period to AM if not already set
+                if (period === undefined) setPeriod('AM');
               }}
             >
               {i}
@@ -101,7 +114,7 @@ const TimePickerDemo = ({ value, onChange, width }) => {
         <PopoverTrigger asChild>
           <Button variant="outline" className={`w-${width} justify-start text-left font-normal`}>
             <Clock className="mr-1 h-4 w-4" />
-            {value ?
+            {value && hours !== undefined && minutes !== undefined && period !== undefined ?
               new Date(`1970-01-01T${value}`).toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
@@ -113,46 +126,61 @@ const TimePickerDemo = ({ value, onChange, width }) => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[280px] p-0">
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-4">
-              <button
-                onClick={() => setView('hours')}
-                className={`text-2xl font-semibold ${view === 'hours' ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                {hours.toString().padStart(2, '0')}
-              </button>
-              <span className="text-2xl font-semibold">:</span>
-              <button
-                onClick={() => setView('minutes')}
-                className={`text-2xl font-semibold ${view === 'minutes' ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                {minutes.toString().padStart(2, '0')}
-              </button>
-              <div className="space-x-2 ml-4">
-                <Button
-                  variant={period === 'AM' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPeriod('AM')}
-                >
-                  AM
-                </Button>
-                <Button
-                  variant={period === 'PM' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPeriod('PM')}
-                >
-                  PM
-                </Button>
-              </div>
-            </div>
-            <div className="relative w-[200px] h-[200px]">
-              {renderClockFace()}
-            </div>
+  <div className="p-4">
+    <div className="flex justify-between items-center mb-4">
+      <button
+        onClick={() => setView('hours')}
+        className={`text-2xl font-semibold ${view === 'hours' ? 'text-primary' : 'text-muted-foreground'}`}
+      >
+        {hours !== undefined ? hours.toString().padStart(2, '0') : '--'}
+      </button>
+      <span className="text-2xl font-semibold">:</span>
+      <button
+        onClick={() => setView('minutes')}
+        className={`text-2xl font-semibold ${view === 'minutes' ? 'text-primary' : 'text-muted-foreground'}`}
+      >
+        {minutes !== undefined ? minutes.toString().padStart(2, '0') : '--'}
+      </button>
+      <div className="flex items-center space-x-2 ml-4">
+        <Button
+          variant={period === 'AM' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setPeriod('AM')}
+        >
+          AM
+        </Button>
+        <Button
+          variant={period === 'PM' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setPeriod('PM')}
+        >
+          PM
+        </Button>
+        
+      </div>
+    </div>
+    <div className="relative w-[200px] h-[200px]">
+      {renderClockFace()}
+    </div>
+    {hours !== undefined && minutes !== undefined && period !== undefined && (
+      <div className='flex justify-end'>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hover:bg-destructive/10 just"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClearTime();
+            }}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
           </div>
-        </PopoverContent>
+        )}
+  </div>
+</PopoverContent>
       </Popover>
     );
   };
 
   export default TimePickerDemo;
-  

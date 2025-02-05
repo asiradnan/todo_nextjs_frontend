@@ -19,7 +19,9 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
     onEdit(todo.id, {
       description: editedDescription,
       due_date: editedDueDate,
-      due_time: editedDueTime
+      due_time: editedDueTime,
+      delete_date: false,
+      delete_time: false
     });
     setIsEditing(false);
   };

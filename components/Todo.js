@@ -133,6 +133,11 @@ export default function TodoList({ onLogout }) {
   const editTodo = async (id, updates) => {
     setActionLoading(true);
     try {
+      console.log(updates);
+      if (updates.due_date === '') {
+        updates.due_date=null
+        updates.delete_date=true
+      }
       await axios.put(
         `${API_BASE_URL}/edit_task/${id}`,
         updates,
