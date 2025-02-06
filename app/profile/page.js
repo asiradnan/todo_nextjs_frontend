@@ -157,11 +157,6 @@ export default function Profile() {
   }
 
   return (
-    <div className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Todo App</h1>
-        <ThemeToggle />
-      </div>
       <div className="container mx-auto pb-4 px-4">
       <Card className="max-w-2xl mx-auto p-6">
         <div className="flex items-center mb-6">
@@ -297,6 +292,5 @@ export default function Profile() {
         </div>
       </Card>
       </div>
-    </div>
   );
 }
