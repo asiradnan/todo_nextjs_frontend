@@ -33,14 +33,26 @@ export default function TodoList({ onLogout }) {
   });
 
   const handleApiError = async (error) => {
-    if (error.response?.status === 401) {
-      const response = await axios.post(`${API_BASE_URL}/refresh_token`,
-        { refresh_token: localStorage.getItem('refresh_token') });
-      localStorage.setItem('access_token', response.data.access_token);
-      localStorage.setItem('refresh_token', response.data.refresh_token);
-    }
     toast.error(error.response?.data?.detail || 'An error occurred');
   };
+
+  const refreshTokenIfExpired = async () => {
+    try {
+      const access_token = localStorage.getItem('access_token');
+      const payload = JSON.parse(atob(access_token.split('.')[1]));
+      const expiry = payload.exp; 
+      console.log(expiry)
+      if(Date.now() < expiry * 1000) return;
+      const response = await axios.post(`${API_BASE_URL}/refresh_token`,
+      { refresh_token: localStorage.getItem('refresh_token') });
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
+
+
 
   useEffect(() => {
     fetchTodos();
@@ -48,6 +60,7 @@ export default function TodoList({ onLogout }) {
 
   const fetchTodos = async () => {
     try {
+      await refreshTokenIfExpired()
       const response = await axios.get(`${API_BASE_URL}/get_tasks`, getAuthHeader());
       setTodos(response.data);
     } catch (error) {
@@ -62,6 +75,7 @@ export default function TodoList({ onLogout }) {
     
     setActionLoading(true);
     try {
+      // await refreshTokenIfExpired()
       await axios.delete(`${API_BASE_URL}/delete_all_completed`,getAuthHeader())
       fetchTodos();
       toast.success('All completed tasks deleted successfully');
@@ -79,6 +93,7 @@ export default function TodoList({ onLogout }) {
 
     setActionLoading(true);
     try {
+      await refreshTokenIfExpired()
       await axios.post(`${API_BASE_URL}/add_task`,
         { description: newTodo, due_date: dueDate || null, due_time: dueTime || null },
         getAuthHeader()
@@ -101,6 +116,7 @@ export default function TodoList({ onLogout }) {
   const toggleTodo = async (id, completed) => {
     setActionLoading(true);
     try {
+      await refreshTokenIfExpired()
       await axios.put(
         `${API_BASE_URL}/edit_task/${id}`,
         { completed },
@@ -120,6 +136,7 @@ export default function TodoList({ onLogout }) {
   const deleteTodo = async (id) => {
     setActionLoading(true);
     try {
+      await refreshTokenIfExpired()
       await axios.delete(`${API_BASE_URL}/delete/${id}`, getAuthHeader());
       setTodos(todos.filter(todo => todo.id !== id));
       toast.success('Task deleted successfully');
@@ -133,11 +150,11 @@ export default function TodoList({ onLogout }) {
   const editTodo = async (id, updates) => {
     setActionLoading(true);
     try {
-      console.log(updates);
       if (updates.due_date === '') {
         updates.due_date=null
         updates.delete_date=true
       }
+      await refreshTokenIfExpired()
       await axios.put(
         `${API_BASE_URL}/edit_task/${id}`,
         updates,
