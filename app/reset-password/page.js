@@ -25,7 +25,7 @@ function ResetPasswordForm() {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    
+
     if (passwords.password !== passwords.confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -54,43 +54,43 @@ function ResetPasswordForm() {
 
   return (
     <Card className="w-full max-w-md p-6">
-          <h2 className="text-2xl font-semibold text-center mb-6">Reset Password</h2>
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type="password"
-                  value={passwords.password}
-                  onChange={(e) => setPasswords({ ...passwords, password: e.target.value })}
-                  className="pl-10"
-                  required
-                />
-                <KeyRound className="h-5 w-5 absolute left-3 top-2.5 text-muted-foreground" />
-              </div>
-            </div>
+      <h2 className="text-2xl font-semibold text-center mb-6">Reset Password</h2>
+      <form onSubmit={handleResetPassword} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="password">New Password</Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type="password"
+              value={passwords.password}
+              onChange={(e) => setPasswords({ ...passwords, password: e.target.value })}
+              className="pl-10"
+              required
+            />
+            <KeyRound className="h-5 w-5 absolute left-3 top-2.5 text-muted-foreground" />
+          </div>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={passwords.confirmPassword}
-                  onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-                  className="pl-10"
-                  required
-                />
-                <KeyRound className="h-5 w-5 absolute left-3 top-2.5 text-muted-foreground" />
-              </div>
-            </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={passwords.confirmPassword}
+              onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+              className="pl-10"
+              required
+            />
+            <KeyRound className="h-5 w-5 absolute left-3 top-2.5 text-muted-foreground" />
+          </div>
+        </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              Reset Password
-            </Button>
-          </form>
-        </Card>
+        <Button type="submit" className="w-full" disabled={loading}>
+          Reset Password
+        </Button>
+      </form>
+    </Card>
   );
 }
 

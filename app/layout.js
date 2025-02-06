@@ -1,4 +1,5 @@
 import './globals.css';
+import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -21,13 +22,21 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <div className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
+          <main className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
       <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Todo App</h1>
+        {/* <h1 className="text-4xl font-bold">Todo App</h1> */}
+        <Image 
+  src="/favicon.ico"
+  alt="Todo App Logo"
+  width={50}
+  height={50}
+  priority
+  className="dark:invert"
+/>
         <ThemeToggle />
       </div>
           {children}
-          </div>
+          </main>
           <Toaster />
         </ThemeProvider>
       </body>
