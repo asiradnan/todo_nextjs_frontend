@@ -157,19 +157,23 @@ export default function Profile() {
   }
 
   return (
-      <div className="container mx-auto pb-4 px-4">
-      <Card className="max-w-2xl mx-auto p-6">
+    <div className="container mx-auto pb-4 px-2 sm:px-4">
+      <Card className="max-w-2xl mx-auto p-3 sm:p-6">
+        {/* Header Section */}
         <div className="flex items-center mb-6">
           <div className="w-40">
             <Button variant="ghost" onClick={() => router.push('/')}>
-              <ArrowLeft className="h-5 w-5 mr-2" />
+              <ArrowLeft className="h-5 w-5 mr-0 sm:mr-2" />
               Back to Tasks
             </Button>
           </div>
           <h2 className="flex-1 text-2xl font-semibold text-center">Profile Settings</h2>
           <div className="w-40" />
         </div>
-        <div className="space-y-8">
+
+        
+
+        <div className="space-y-6 sm:space-y-8">
           {/* Profile Information */}
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="space-y-4">
@@ -196,7 +200,7 @@ export default function Profile() {
                     </span>
                   )}
                 </div>
-                <div className="relative flex gap-2">
+                <div className="relative flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
                     <Input
                       id="email"
@@ -211,27 +215,31 @@ export default function Profile() {
                   <Button
                     type="button"
                     variant="destructive"
-                    size="icon"
                     onClick={handleDeleteEmail}
                     disabled={!userData.email || saving}
+                    className="w-full h-10 sm:w-12 sm:h-10 flex items-center justify-center"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:justify-between">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleResendVerification}
                 disabled={saving}
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Send Verification Email
               </Button>
-              <Button type="submit" disabled={saving}>
+              <Button 
+                type="submit" 
+                disabled={saving}
+                className="w-full sm:w-auto order-1 sm:order-2"
+              >
                 <Save className="h-5 w-5 mr-2" />
                 Save Changes
               </Button>
@@ -291,6 +299,6 @@ export default function Profile() {
           </form>
         </div>
       </Card>
-      </div>
+    </div>
   );
 }

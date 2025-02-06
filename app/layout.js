@@ -28,8 +28,8 @@ export default function RootLayout({ children }) {
         <Image 
   src="/favicon.ico"
   alt="Todo App Logo"
-  width={50}
-  height={50}
+  width={40}
+  height={40}
   priority
   className="dark:invert"
 />
