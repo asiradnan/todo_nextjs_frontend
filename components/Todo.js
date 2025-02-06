@@ -62,8 +62,8 @@ export default function TodoList({ onLogout }) {
     
     setActionLoading(true);
     try {
-      axios.delete(`${API_BASE_URL}/delete_all_completed`,getAuthHeader())
-      await fetchTodos();
+      await axios.delete(`${API_BASE_URL}/delete_all_completed`,getAuthHeader())
+      fetchTodos();
       toast.success('All completed tasks deleted successfully');
     } catch (error) {
       handleApiError(error);

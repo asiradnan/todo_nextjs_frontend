@@ -23,7 +23,8 @@ const TimePickerDemo = ({ value, onChange, width }) => {
     });
   
     const [view, setView] = useState('hours'); // 'hours' or 'minutes'
-  
+    const [open, setOpen] = useState(false);
+
     useEffect(() => {
       // Only format and send time if all values are defined
       if (hours !== undefined && minutes !== undefined && period !== undefined) {
@@ -38,11 +39,13 @@ const TimePickerDemo = ({ value, onChange, width }) => {
       }
     }, [hours, minutes, period]);
 
-    const handleClearTime = () => {
+    const handleClearTime = (forced) => {
+      if (forced && value) return;
       setHours(undefined);
       setMinutes(undefined);
       setPeriod(undefined);
       onChange(null);
+      setView('hours');
     };
   
     const renderClockFace = () => {
@@ -110,9 +113,9 @@ const TimePickerDemo = ({ value, onChange, width }) => {
     };
   
     return (
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}> 
         <PopoverTrigger asChild>
-          <Button variant="outline" className={`w-${width} justify-start text-left font-normal`}>
+          <Button variant="outline" className={`w-${width} justify-start text-left font-normal`} onClick={() => handleClearTime(true)}>
             <Clock className="mr-1 h-4 w-4" />
             {value && hours !== undefined && minutes !== undefined && period !== undefined ?
               new Date(`1970-01-01T${value}`).toLocaleTimeString('en-US', {
@@ -121,7 +124,7 @@ const TimePickerDemo = ({ value, onChange, width }) => {
                 hour12: true
               })
               :
-              <span>Pick time</span>
+              <span className='text-muted-foreground'>Pick time</span>
             }
           </Button>
         </PopoverTrigger>
@@ -163,19 +166,26 @@ const TimePickerDemo = ({ value, onChange, width }) => {
       {renderClockFace()}
     </div>
     {hours !== undefined && minutes !== undefined && period !== undefined && (
-      <div className='flex justify-end'>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="hover:bg-destructive/10 just"
-            onClick={(e) => {
+      <div className='flex justify-between'>
+      <Button 
+          variant="ghost" 
+          size="icon" 
+          className="hover:bg-destructive/10"
+          onClick={(e) => {
               e.stopPropagation();
               handleClearTime();
-            }}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-          </div>
+          }}
+      >
+          <Trash2 className="h-4 w-4 text-destructive" />
+      </Button>
+      <Button
+          variant="default"
+          size="sm"
+          onClick={() => {setOpen(false)}}
+      >
+          OK
+      </Button>
+  </div>
         )}
   </div>
 </PopoverContent>
