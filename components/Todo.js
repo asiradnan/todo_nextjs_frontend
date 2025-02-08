@@ -14,6 +14,7 @@ import TimePickerDemo from '@/components/TimePicker.js';
 import { PlusCircle, LogOut, CalendarIcon, UserRound, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import sortTasksByDateTime from '@/helpers/sortTasks';
 
 const API_BASE_URL = 'https://todofastapi.asiradnan.com';
 
@@ -62,7 +63,7 @@ export default function TodoList({ onLogout }) {
     try {
       await refreshTokenIfExpired()
       const response = await axios.get(`${API_BASE_URL}/get_tasks`, getAuthHeader());
-      setTodos(response.data);
+      setTodos(sortTasksByDateTime(response.data));
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -85,7 +86,6 @@ export default function TodoList({ onLogout }) {
       setActionLoading(false);
     }
   };
-
 
   const addTodo = async (e) => {
     e.preventDefault();
@@ -111,7 +111,7 @@ export default function TodoList({ onLogout }) {
   };
 
   const activeTodos = todos.filter(todo => !todo.completed);
-  const completedTodos = todos.filter(todo => todo.completed);
+  const completedTodos = todos.filter(todo => todo.completed).reverse();
 
   const toggleTodo = async (id, completed) => {
     setActionLoading(true);
