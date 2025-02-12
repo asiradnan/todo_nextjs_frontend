@@ -255,7 +255,7 @@ export default function TodoList({ onLogout }) {
         className="w-full"
         onValueChange={setCurrentTab}
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 mb-3">
           <TabsTrigger value="active">
             Active ({activeTodos.length})
           </TabsTrigger>

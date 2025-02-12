@@ -29,7 +29,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   return (
     <Popover open={isEditing} onOpenChange={setIsEditing}>
       <PopoverTrigger asChild>
-        <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+        <div className="flex items-center justify-between p-2 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
           <div className="flex items-center gap-3 w-full">
             <Checkbox
               checked={todo.completed}
@@ -38,6 +38,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                 setIsEditing(false);
               }}
               onClick={(e) => e.stopPropagation()}
+              className="h-4 w-4"
             />
             <div className="flex justify-between items-center w-full">
               <span className={`${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
