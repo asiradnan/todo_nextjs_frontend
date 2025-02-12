@@ -188,7 +188,7 @@ export default function TodoList({ onLogout }) {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto p-2 sm:p-4 pb-8">
+    <Card className="w-full max-w-2xl mx-auto p-2 sm:p-4 pb-8 sm:mt-0 mt-4">
       <div className="flex justify-between mb-2 flex-wrap gap-2">
         <Button variant="ghost" onClick={handleProfileClick} className="text-sm sm:text-base">
           Profile

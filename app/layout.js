@@ -23,19 +23,19 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <main className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
-      <div className="flex justify-between items-center">
-        {/* <h1 className="text-4xl font-bold">Todo App</h1> */}
-        <Image 
-  src="/favicon.ico"
-  alt="Todo App Logo"
-  width={40}
-  height={40}
-  priority
-  className="dark:invert"
-/>
-        <ThemeToggle />
-      </div>
-          {children}
+            <div className="flex justify-between items-center">
+              {/* <h1 className="text-4xl font-bold">Todo App</h1> */}
+              <Image
+                src="/favicon.ico"
+                alt="Todo App Logo"
+                width={40}
+                height={40}
+                priority
+                className="dark:invert"
+              />
+              <ThemeToggle />
+            </div>
+            {children}
           </main>
           <Toaster />
         </ThemeProvider>
