@@ -46,21 +46,42 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               </span>
               <span className="text-sm text-muted-foreground text-right">
                 {(() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+
+                  const getDateColor = (dateStr) => {
+                    if (!dateStr) return '';
+                    const todoDate = new Date(dateStr);
+                    todoDate.setHours(0, 0, 0, 0);
+
+                    if (todoDate < today) return 'text-[#B71C1C]';
+                    if (todoDate.getTime() === today.getTime()) return 'text-[#009688]';
+                    return 'text-[#0D47A1]';
+                  };
+
                   if (todo.due_date && todo.due_time) {
-                    return new Date(todo.due_date).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    }) + " at " +
-                      new Date('1970-01-01T' + todo.due_time).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                      });
+                    return (
+                      <span className={getDateColor(todo.due_date)}>
+                        {new Date(todo.due_date).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        }) + " at " +
+                          new Date('1970-01-01T' + todo.due_time).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                          })}
+                      </span>
+                    );
                   } else if (todo.due_date) {
-                    return new Date(todo.due_date).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    });
+                    return (
+                      <span className={getDateColor(todo.due_date)}>
+                        {new Date(todo.due_date).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    );
                   } else if (todo.due_time) {
                     return new Date('1970-01-01T' + todo.due_time).toLocaleTimeString('en-US', {
                       hour: 'numeric',
@@ -71,76 +92,77 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                   return '';
                 })()}
               </span>
+
             </div>
           </div>
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-5 shadow-lg rounded-xl">
-  <div className="space-y-5">
-    <div className="space-y-3">
-      <h3 className="font-medium text-sm">Edit Task</h3>
-      <Input
-        value={editedDescription}
-        onChange={(e) => setEditedDescription(e.target.value)}
-        placeholder="Task description"
-        className="transition-all focus:ring-2 focus:ring-primary/20"
-      />
-    </div>
-    <div className="flex gap-3">
-  <Popover>
-    <PopoverTrigger asChild>
-      <Button
-        variant="outline"
-        className={`w-[50%] justify-start text-left font-normal hover:border-primary/50 transition-colors ${!editedDueDate && "text-muted-foreground"}`}
-      >
-        <CalendarIcon className="mr-2 h-4 w-4" />
-        {editedDueDate ? format(new Date(editedDueDate), "MMM d") : "Pick date"}
-      </Button>
-    </PopoverTrigger>
-    <PopoverContent className="w-auto p-0 shadow-xl" align="start">
-      <Calendar
-        mode="single"
-        selected={editedDueDate ? new Date(editedDueDate) : undefined}
-        onSelect={(date) => setEditedDueDate(date ? format(date, "yyyy-MM-dd") : "")}
-        initialFocus
-        className="rounded-lg border-none"
-      />
-    </PopoverContent>
-  </Popover>
-  <TimePickerDemo
-    value={editedDueTime}
-    onChange={setEditedDueTime}
-    width={"[50%]"}
-    className="w-[50%]"
-  />
-</div>
-    <div className="flex justify-between pt-2 border-t">
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={() => {
-          onDelete(todo.id);
-          setIsEditing(false);
-        }}
-        className="hover:opacity-90 transition-opacity"
-      >
-        <Trash2 className="h-4 w-4 mr-2" />
-        Delete
-      </Button>
-      <div className="space-x-3">
-        
-        <Button
-          size="sm"
-          onClick={handleSave}
-          disabled={!editedDescription.trim()}
-          className="hover:opacity-90 transition-opacity"
-        >
-          Save Changes
-        </Button>
-      </div>
-    </div>
-  </div>
-</PopoverContent>
+        <div className="space-y-5">
+          <div className="space-y-3">
+            <h3 className="font-medium text-sm">Edit Task</h3>
+            <Input
+              value={editedDescription}
+              onChange={(e) => setEditedDescription(e.target.value)}
+              placeholder="Task description"
+              className="transition-all focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <div className="flex gap-3">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={`w-[50%] justify-start text-left font-normal hover:border-primary/50 transition-colors ${!editedDueDate && "text-muted-foreground"}`}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {editedDueDate ? format(new Date(editedDueDate), "MMM d") : "Pick date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 shadow-xl" align="start">
+                <Calendar
+                  mode="single"
+                  selected={editedDueDate ? new Date(editedDueDate) : undefined}
+                  onSelect={(date) => setEditedDueDate(date ? format(date, "yyyy-MM-dd") : "")}
+                  initialFocus
+                  className="rounded-lg border-none"
+                />
+              </PopoverContent>
+            </Popover>
+            <TimePickerDemo
+              value={editedDueTime}
+              onChange={setEditedDueTime}
+              width={"[50%]"}
+              className="w-[50%]"
+            />
+          </div>
+          <div className="flex justify-between pt-2 border-t">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                onDelete(todo.id);
+                setIsEditing(false);
+              }}
+              className="hover:opacity-90 transition-opacity"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+            <div className="space-x-3">
+
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={!editedDescription.trim()}
+                className="hover:opacity-90 transition-opacity"
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
 
     </Popover>
   );
