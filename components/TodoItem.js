@@ -50,14 +50,15 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                   today.setHours(0, 0, 0, 0);
 
                   const getDateColor = (dateStr) => {
-                    if (!dateStr) return '';
+                    if (!dateStr || todo.completed) return '';
                     const todoDate = new Date(dateStr);
                     todoDate.setHours(0, 0, 0, 0);
-
+                  
                     if (todoDate < today) return 'text-[#B71C1C]';
                     if (todoDate.getTime() === today.getTime()) return 'text-[#009688]';
                     return 'text-[#0D47A1]';
                   };
+                  
 
                   if (todo.due_date && todo.due_time) {
                     return (
