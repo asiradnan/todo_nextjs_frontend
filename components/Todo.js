@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import TodoItem from '@/components/TodoItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -59,6 +60,34 @@ export default function TodoList({ onLogout }) {
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  const [showNotification, setShowNotification] = useState(false);
+const [currentNotification, setCurrentNotification] = useState(null);
+const notificationSound = typeof window !== 'undefined' ? new Audio('/notification.mp3') : null;
+
+// Add this function inside TodoList component
+const checkDueTasks = useCallback(() => {
+  const now = new Date();
+  todos.forEach(todo => {
+    
+    if (todo.completed) return;
+    if (todo.due_date && todo.due_time) {
+      const dueDateTime = new Date(`${todo.due_date}T${todo.due_time}`);
+      if (Math.abs(dueDateTime - now) < 1000) { // Within 1 second of due time
+        notificationSound?.play();
+        setCurrentNotification(todo);
+        setShowNotification(true);
+        console.log(`Notification for ${todo.description} due at ${todo.due_date} ${todo.due_time}`);
+      }
+    }
+  });
+}, [todos]);
+
+// Add this useEffect after the existing useEffect
+useEffect(() => {
+  const interval = setInterval(checkDueTasks, 1000);
+  return () => clearInterval(interval);
+}, [checkDueTasks]);
 
   const fetchTodos = async () => {
     try {
@@ -317,6 +346,21 @@ export default function TodoList({ onLogout }) {
           )}
         </TabsContent>
       </Tabs>
+      <Dialog open={showNotification} onOpenChange={setShowNotification}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle className="text-center text-xl">Task Due Now!</DialogTitle>
+    </DialogHeader>
+    <div className="p-6">
+      <p className="text-lg text-center">{currentNotification?.description}</p>
+      <div className="mt-4 flex justify-center">
+        <Button onClick={() => setShowNotification(false)}>
+          Dismiss
+        </Button>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
     </Card>
   );
 }
