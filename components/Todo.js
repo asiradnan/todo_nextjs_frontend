@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from 'sonner';
 import { format } from "date-fns";
-import TimePickerDemo from '@/components/TimePicker.js';  
+import TimePickerDemo from '@/components/TimePicker.js';
 import { PlusCircle, LogOut, CalendarIcon, UserRound, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,7 @@ export default function TodoList({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('active');
+  const [isInputError, setIsInputError] = useState(false);
 
   const getAuthHeader = () => ({
     headers: {
@@ -41,11 +42,11 @@ export default function TodoList({ onLogout }) {
     try {
       const access_token = localStorage.getItem('access_token');
       const payload = JSON.parse(atob(access_token.split('.')[1]));
-      const expiry = payload.exp; 
+      const expiry = payload.exp;
       console.log(expiry)
-      if(Date.now() < expiry * 1000) return;
+      if (Date.now() < expiry * 1000) return;
       const response = await axios.post(`${API_BASE_URL}/refresh_token`,
-      { refresh_token: localStorage.getItem('refresh_token') });
+        { refresh_token: localStorage.getItem('refresh_token') });
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
     } catch (error) {
@@ -73,11 +74,11 @@ export default function TodoList({ onLogout }) {
 
   const deleteAllCompletedTasks = async () => {
     if (actionLoading || !completedTodos.length) return;
-    
+
     setActionLoading(true);
     try {
       // await refreshTokenIfExpired()
-      await axios.delete(`${API_BASE_URL}/delete_all_completed`,getAuthHeader())
+      await axios.delete(`${API_BASE_URL}/delete_all_completed`, getAuthHeader())
       fetchTodos();
       toast.success('All completed tasks deleted successfully');
     } catch (error) {
@@ -89,7 +90,13 @@ export default function TodoList({ onLogout }) {
 
   const addTodo = async (e) => {
     e.preventDefault();
-    if (!newTodo.trim() || actionLoading) return;
+    if (!newTodo.trim() || actionLoading) {
+      setIsInputError(true);
+      toast.warning('Please enter a task description');
+      return;
+    }
+    setIsInputError(false);
+
 
     setActionLoading(true);
     try {
@@ -151,8 +158,8 @@ export default function TodoList({ onLogout }) {
     setActionLoading(true);
     try {
       if (updates.due_date === '') {
-        updates.due_date=null
-        updates.delete_date=true
+        updates.due_date = null
+        updates.delete_date = true
       }
       await refreshTokenIfExpired()
       await axios.put(
@@ -205,11 +212,14 @@ export default function TodoList({ onLogout }) {
           <Input
             type="text"
             value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
+            onChange={(e) => {
+              setIsInputError(false);
+              setNewTodo(e.target.value);
+              
+            }}
             placeholder="Add a new task..."
-            className="flex-1"
+            className={`flex-1 ${isInputError ? 'ring-red-500 ring-1' : ''}`}
             disabled={actionLoading}
-            required
           />
           <div className="flex gap-2">
             <Popover>
@@ -248,10 +258,10 @@ export default function TodoList({ onLogout }) {
         </div>
       </form>
 
-      
 
-      <Tabs 
-        defaultValue="active" 
+
+      <Tabs
+        defaultValue="active"
         className="w-full"
         onValueChange={setCurrentTab}
       >
@@ -265,16 +275,16 @@ export default function TodoList({ onLogout }) {
         </TabsList>
         {currentTab === 'completed' && completedTodos.length > 0 && (
           <div className="flex justify-end items-center m-2">
-          <Button 
-            onClick={deleteAllCompletedTasks} 
-            disabled={actionLoading || !completedTodos.length}
-            variant="outline"
-            className="w-full sm:w-auto text-destructive hover:bg-destructive hover:text-destructive-foreground"
-          >
-            <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-            Delete All Completed Tasks
-          </Button>
-        </div>
+            <Button
+              onClick={deleteAllCompletedTasks}
+              disabled={actionLoading || !completedTodos.length}
+              variant="outline"
+              className="w-full sm:w-auto text-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
+              <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              Delete All Completed Tasks
+            </Button>
+          </div>
         )}
         <TabsContent value="active" className="space-y-4">
           {activeTodos.length === 0 ? (
