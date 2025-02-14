@@ -98,16 +98,11 @@ function ResetPasswordForm() {
 
 export default function ResetPassword() {
   return (
-    <div className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Todo App</h1>
-        <ThemeToggle />
-      </div>
+
       <div className="flex-grow flex items-center justify-center">
         <Suspense fallback={<div>Loading...</div>}>
           <ResetPasswordForm />
         </Suspense>
       </div>
-    </div>
   );
 }
