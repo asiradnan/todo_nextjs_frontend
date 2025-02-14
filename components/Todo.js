@@ -62,32 +62,32 @@ export default function TodoList({ onLogout }) {
   }, []);
 
   const [showNotification, setShowNotification] = useState(false);
-const [currentNotification, setCurrentNotification] = useState(null);
-const notificationSound = typeof window !== 'undefined' ? new Audio('/notification.mp3') : null;
+  const [currentNotification, setCurrentNotification] = useState(null);
+  const notificationSound = typeof window !== 'undefined' ? new Audio('/notification.mp3') : null;
 
-// Add this function inside TodoList component
-const checkDueTasks = useCallback(() => {
-  const now = new Date();
-  todos.forEach(todo => {
-    
-    if (todo.completed) return;
-    if (todo.due_date && todo.due_time) {
-      const dueDateTime = new Date(`${todo.due_date}T${todo.due_time}`);
-      if (Math.abs(dueDateTime - now) < 1000) { // Within 1 second of due time
-        notificationSound?.play();
-        setCurrentNotification(todo);
-        setShowNotification(true);
-        console.log(`Notification for ${todo.description} due at ${todo.due_date} ${todo.due_time}`);
+  // Add this function inside TodoList component
+  const checkDueTasks = useCallback(() => {
+    const now = new Date();
+    todos.forEach(todo => {
+
+      if (todo.completed) return;
+      if (todo.due_date && todo.due_time) {
+        const dueDateTime = new Date(`${todo.due_date}T${todo.due_time}`);
+        if (Math.abs(dueDateTime - now) < 1000) { // Within 1 second of due time
+          notificationSound?.play();
+          setCurrentNotification(todo);
+          setShowNotification(true);
+          console.log(`Notification for ${todo.description} due at ${todo.due_date} ${todo.due_time}`);
+        }
       }
-    }
-  });
-}, [todos]);
+    });
+  }, [todos]);
 
-// Add this useEffect after the existing useEffect
-useEffect(() => {
-  const interval = setInterval(checkDueTasks, 1000);
-  return () => clearInterval(interval);
-}, [checkDueTasks]);
+  // Add this useEffect after the existing useEffect
+  useEffect(() => {
+    const interval = setInterval(checkDueTasks, 1000);
+    return () => clearInterval(interval);
+  }, [checkDueTasks]);
 
   const fetchTodos = async () => {
     try {
@@ -125,8 +125,6 @@ useEffect(() => {
       return;
     }
     setIsInputError(false);
-
-
     setActionLoading(true);
     try {
       await refreshTokenIfExpired()
@@ -244,7 +242,7 @@ useEffect(() => {
             onChange={(e) => {
               setIsInputError(false);
               setNewTodo(e.target.value);
-              
+
             }}
             placeholder="Add a new task..."
             className={`flex-1 ${isInputError ? 'ring-red-500 ring-1' : ''}`}
@@ -347,20 +345,20 @@ useEffect(() => {
         </TabsContent>
       </Tabs>
       <Dialog open={showNotification} onOpenChange={setShowNotification}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle className="text-center text-xl">Task Due Now!</DialogTitle>
-    </DialogHeader>
-    <div className="p-6">
-      <p className="text-lg text-center">{currentNotification?.description}</p>
-      <div className="mt-4 flex justify-center">
-        <Button onClick={() => setShowNotification(false)}>
-          Dismiss
-        </Button>
-      </div>
-    </div>
-  </DialogContent>
-</Dialog>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Task Due Now!</DialogTitle>
+          </DialogHeader>
+          <div className="p-6">
+            <p className="text-lg text-center">{currentNotification?.description}</p>
+            <div className="mt-4 flex justify-center">
+              <Button onClick={() => setShowNotification(false)}>
+                Dismiss
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
