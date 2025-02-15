@@ -105,6 +105,13 @@ export default function TodoList({ onLogout }) {
     }
   };
 
+  const activeTodos = todos.filter(todo => !todo.completed);
+  
+  const completedTodos = todos
+    .filter(todo => todo.completed)
+    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)); // Example: Sort by completion date in descending order
+
+
   const deleteAllCompletedTasks = async () => {
     if (actionLoading || !completedTodos.length) return;
 
@@ -148,8 +155,6 @@ export default function TodoList({ onLogout }) {
     }
   };
 
-  const activeTodos = todos.filter(todo => !todo.completed);
-  const completedTodos = todos.filter(todo => todo.completed).reverse();
 
   const toggleTodo = async (id, completed) => {
     setActionLoading(true);
