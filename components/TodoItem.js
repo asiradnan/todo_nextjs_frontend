@@ -25,11 +25,30 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
     });
     setIsEditing(false);
   };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const classDict = {
+    'future': 'text-[#A0A0A0]',
+    'past': 'text-[#606060]',
+}
+  const getDateColor = (dateStr) => {
+    console.log(dateStr);
+    if (todo.completed) return '';
+    if (!dateStr) return classDict.future; 
+    
+    const todoDate = new Date(dateStr);
+    todoDate.setHours(0, 0, 0, 0);
+
+    if (todoDate < today) return classDict.past; 
+    if (todoDate.getTime() === today.getTime()) return ''; 
+    return classDict.future;  
+  };
 
   return (
     <Popover open={isEditing} onOpenChange={setIsEditing}>
       <PopoverTrigger asChild>
-        <div className="flex items-center justify-between p-2 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+        <div className={`flex items-center justify-between p-2 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer ${getDateColor(todo.due_date)}`}>
           <div className="flex items-center gap-3 w-full">
             <Checkbox
               checked={todo.completed}
@@ -41,28 +60,14 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               className="h-4 w-4"
             />
             <div className="flex justify-between items-center w-full">
-              <span className={`${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+              <span className={`${todo.completed ? 'line-through text-muted-foreground' : ''}} `}>
                 {todo.description}
               </span>
               <span className="text-sm text-muted-foreground text-right">
                 {(() => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-
-                  const getDateColor = (dateStr) => {
-                    if (!dateStr || todo.completed) return '';
-                    const todoDate = new Date(dateStr);
-                    todoDate.setHours(0, 0, 0, 0);
-                  
-                    if (todoDate < today) return 'text-[#B71C1C]';
-                    if (todoDate.getTime() === today.getTime()) return 'text-[#009688]';
-                    return 'text-[#0D47A1]';
-                  };
-                  
-
                   if (todo.due_date && todo.due_time) {
                     return (
-                      <span className={getDateColor(todo.due_date)}>
+                      <span>
                         {new Date(todo.due_date).toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric'
@@ -76,7 +81,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                     );
                   } else if (todo.due_date) {
                     return (
-                      <span className={getDateColor(todo.due_date)}>
+                      <span>
                         {new Date(todo.due_date).toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric'
