@@ -45,7 +45,7 @@ export default function Profile() {
       localStorage.setItem('refresh_token', response.data.refresh_token);
     }
     catch (error) {
-      router.push('/login');
+      router.push('/');
     }
   }
 
