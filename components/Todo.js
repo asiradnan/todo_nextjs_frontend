@@ -51,12 +51,12 @@ export default function TodoList({ onLogout }) {
   }
 
   const isRefreshTokenExpired = () => {
-      const access_token = localStorage.getItem('access_token');
-      if (!access_token) return true;
-      const payload = JSON.parse(atob(access_token.split('.')[1]));
-      const expiry = payload.exp;
-      if (Date.now() < expiry * 1000) return false;
-      return true;
+    const access_token = localStorage.getItem('access_token');
+    if (!access_token) return true;
+    const payload = JSON.parse(atob(access_token.split('.')[1]));
+    const expiry = payload.exp;
+    if (Date.now() < expiry * 1000) return false;
+    return true;
   };
 
 
@@ -213,11 +213,6 @@ export default function TodoList({ onLogout }) {
     onLogout();
   };
 
-  const router = useRouter();
-  const handleProfileClick = () => {
-    router.push('/profile');
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -229,10 +224,10 @@ export default function TodoList({ onLogout }) {
   return (
     <Card className="w-full max-w-2xl mx-auto p-2 sm:p-4 pb-8 sm:mt-0 mt-4">
       <div className="flex justify-between mb-2 flex-wrap gap-2">
-      <Link href="/profile" className="text-sm sm:text-base inline-flex items-center hover:bg-accent hover:text-accent-foreground rounded-md px-4 py-2">
-  Profile
-  <UserRound className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
-</Link>
+        <Link href="/profile" className="text-sm sm:text-base inline-flex items-center hover:bg-accent hover:text-accent-foreground rounded-md px-4 py-2">
+          Profile
+          <UserRound className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+        </Link>
         <Button variant="ghost" onClick={handleLogout} className="text-sm sm:text-base">
           <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
           Logout

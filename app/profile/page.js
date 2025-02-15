@@ -167,19 +167,20 @@ export default function Profile() {
   }
 
   return (
-    <div className="container mx-auto pb-4 px-2 sm:px-4">
+    <div className="container mx-auto pb-4 px-2 sm:px-4 sm:mt-0 mt-4">
       <Card className="max-w-2xl mx-auto p-3 sm:p-6">
         {/* Header Section */}
         <div className="flex items-center mb-6">
           <div className="w-40">
             <Link href="/" className="inline-flex items-center hover:bg-accent hover:text-accent-foreground rounded-md px-1 py-2">
               <ArrowLeft className="h-5 w-5 mr-0 sm:mr-2" />
-              Back to Tasks
+              <span className="text-xs sm:text-base">Back to Tasks</span>
             </Link>
           </div>
-          <h2 className="flex-1 text-2xl font-semibold text-center">Profile Settings</h2>
+          <h2 className="flex-1 text-xl sm:text-2xl font-semibold text-center">Profile Settings</h2>
           <div className="w-40" />
         </div>
+
 
 
 
