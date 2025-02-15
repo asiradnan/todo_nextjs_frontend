@@ -11,8 +11,11 @@ import dayjs from 'dayjs';
 
 const TimePickerDemo = ({ value, onChange, width }) => {
   const [open, setOpen] = useState(false);
+  const [period, setPeriod] = useState(() => {
+    if (!value) return 'AM';
+    return dayjs(`1970-01-01T${value}`).format('A');
+  });
 
-  // Convert string time to dayjs object for TimeClock
   const getTimeValue = () => {
     if (!value) return null;
     return dayjs(`1970-01-01T${value}`);
@@ -23,10 +26,26 @@ const TimePickerDemo = ({ value, onChange, width }) => {
       onChange(null);
       return;
     }
-
-    // Format the time as HH:mm
+    // Adjust time based on AM/PM selection
+    let hours = newValue.hour();
+    if (period === 'PM' && hours < 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    newValue = newValue.hour(hours);
     const timeString = newValue.format('HH:mm');
     onChange(timeString);
+  };
+
+  const togglePeriod = () => {
+    const newPeriod = period === 'AM' ? 'PM' : 'AM';
+    setPeriod(newPeriod);
+    if (value) {
+      const currentTime = dayjs(`1970-01-01T${value}`);
+      let hours = currentTime.hour();
+      if (newPeriod === 'PM' && hours < 12) hours += 12;
+      if (newPeriod === 'AM' && hours >= 12) hours -= 12;
+      const newTime = currentTime.hour(hours);
+      onChange(newTime.format('HH:mm'));
+    }
   };
 
   const handleClearTime = () => {
@@ -49,8 +68,26 @@ const TimePickerDemo = ({ value, onChange, width }) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[280px] p-0">
-
         <div className="p-0">
+          {/* AM/PM Toggle Buttons */}
+          <div className="flex justify-end p-2 gap-1">
+            <Button
+              variant={period === 'AM' ? "default" : "outline"}
+              size="sm"
+              onClick={() => period === 'PM' && togglePeriod()}
+              className="w-12"
+            >
+              AM
+            </Button>
+            <Button
+              variant={period === 'PM' ? "default" : "outline"}
+              size="sm"
+              onClick={() => period === 'AM' && togglePeriod()}
+              className="w-12"
+            >
+              PM
+            </Button>
+          </div>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <TimeClock
               value={getTimeValue()}
@@ -80,7 +117,6 @@ const TimePickerDemo = ({ value, onChange, width }) => {
                   color: 'hsl(var(--foreground))'
                 }
               }}
-
             />
           </LocalizationProvider>
           <div className='flex justify-between h-10 m-3 mt-0'>
