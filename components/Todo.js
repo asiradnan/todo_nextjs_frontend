@@ -16,6 +16,7 @@ import { PlusCircle, LogOut, CalendarIcon, UserRound, Trash2 } from 'lucide-reac
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import sortTasksByDateTime from '@/helpers/sortTasks';
+import Link from 'next/link';
 
 const API_BASE_URL = 'https://todofastapi.asiradnan.com';
 
@@ -35,24 +36,27 @@ export default function TodoList({ onLogout }) {
     }
   });
 
-  const handleApiError = async (error) => {
-    toast.error(error.response?.data?.detail || 'An error occurred');
-  };
-
   const refreshTokenIfExpired = async () => {
     try {
-      const access_token = localStorage.getItem('access_token');
-      const payload = JSON.parse(atob(access_token.split('.')[1]));
-      const expiry = payload.exp;
-      console.log(expiry)
-      if (Date.now() < expiry * 1000) return;
+      if (!isRefreshTokenExpired()) return;
+      console.log("refreshing")
       const response = await axios.post(`${API_BASE_URL}/refresh_token`,
         { refresh_token: localStorage.getItem('refresh_token') });
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
-    } catch (error) {
-      handleApiError(error);
     }
+    catch (error) {
+      router.push('/login');
+    }
+  }
+
+  const isRefreshTokenExpired = () => {
+      const access_token = localStorage.getItem('access_token');
+      if (!access_token) return true;
+      const payload = JSON.parse(atob(access_token.split('.')[1]));
+      const expiry = payload.exp;
+      if (Date.now() < expiry * 1000) return false;
+      return true;
   };
 
 
@@ -95,7 +99,7 @@ export default function TodoList({ onLogout }) {
       const response = await axios.get(`${API_BASE_URL}/get_tasks`, getAuthHeader());
       setTodos(sortTasksByDateTime(response.data));
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired();
     } finally {
       setLoading(false);
     }
@@ -111,7 +115,7 @@ export default function TodoList({ onLogout }) {
       fetchTodos();
       toast.success('All completed tasks deleted successfully');
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired()
     } finally {
       setActionLoading(false);
     }
@@ -138,7 +142,7 @@ export default function TodoList({ onLogout }) {
       setDueTime('');
       toast.success('Task added successfully');
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired()
     } finally {
       setActionLoading(false);
     }
@@ -161,7 +165,7 @@ export default function TodoList({ onLogout }) {
       ));
       toast.success('Task updated successfully');
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired()
     } finally {
       setActionLoading(false);
     }
@@ -175,7 +179,7 @@ export default function TodoList({ onLogout }) {
       setTodos(todos.filter(todo => todo.id !== id));
       toast.success('Task deleted successfully');
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired()
     } finally {
       setActionLoading(false);
     }
@@ -197,7 +201,7 @@ export default function TodoList({ onLogout }) {
       fetchTodos();
       toast.success('Task updated successfully');
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired()
     } finally {
       setActionLoading(false);
     }
@@ -205,6 +209,7 @@ export default function TodoList({ onLogout }) {
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     onLogout();
   };
 
@@ -224,10 +229,10 @@ export default function TodoList({ onLogout }) {
   return (
     <Card className="w-full max-w-2xl mx-auto p-2 sm:p-4 pb-8 sm:mt-0 mt-4">
       <div className="flex justify-between mb-2 flex-wrap gap-2">
-        <Button variant="ghost" onClick={handleProfileClick} className="text-sm sm:text-base">
-          Profile
-          <UserRound className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
-        </Button>
+      <Link href="/profile" className="text-sm sm:text-base inline-flex items-center hover:bg-accent hover:text-accent-foreground rounded-md px-4 py-2">
+  Profile
+  <UserRound className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+</Link>
         <Button variant="ghost" onClick={handleLogout} className="text-sm sm:text-base">
           <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
           Logout

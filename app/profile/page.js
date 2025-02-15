@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Mail, User, KeyRound, Save, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import ThemeToggle from '@/components/ThemeToggle';
+import Link from 'next/link';
 
 
 const API_BASE_URL = 'https://todofastapi.asiradnan.com';
@@ -35,26 +35,36 @@ export default function Profile() {
     }
   });
 
-  const handleApiError = async (error) => {
-    if (error.response?.status === 401) {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/refresh_token`,
-          { refresh_token: localStorage.getItem('refresh_token') });
-        localStorage.setItem('access_token', response.data.access_token);
-        localStorage.setItem('refresh_token', response.data.refresh_token);
-      } catch (refreshError) {
-        router.push('/login');
-      }
+  const refreshTokenIfExpired = async () => {
+    try {
+      if (!isRefreshTokenExpired()) return;
+      console.log("refreshing")
+      const response = await axios.post(`${API_BASE_URL}/refresh_token`,
+        { refresh_token: localStorage.getItem('refresh_token') });
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
     }
-    toast.error(error.response?.data?.detail || 'An error occurred');
-  };
+    catch (error) {
+      router.push('/login');
+    }
+  }
 
+  const isRefreshTokenExpired = () => {
+    const access_token = localStorage.getItem('access_token');
+    if (!access_token) return true;
+    const payload = JSON.parse(atob(access_token.split('.')[1]));
+    const expiry = payload.exp;
+    if (Date.now() < expiry * 1000) return false;
+    return true;
+  };
   useEffect(() => {
     fetchUserData();
   }, []);
 
   const fetchUserData = async () => {
     try {
+      await refreshTokenIfExpired();
+      console.log("fetching")
       const response = await axios.get(`${API_BASE_URL}/me`, getAuthHeader());
       setUserData({
         username: response.data.username || '',
@@ -62,7 +72,7 @@ export default function Profile() {
         verified: response.data.verified || false
       });
     } catch (error) {
-      handleApiError(error);
+      refreshTokenIfExpired();
     } finally {
       setLoading(false);
     }
@@ -162,16 +172,16 @@ export default function Profile() {
         {/* Header Section */}
         <div className="flex items-center mb-6">
           <div className="w-40">
-            <Button variant="ghost" onClick={() => router.push('/')}>
+            <Link href="/" className="inline-flex items-center hover:bg-accent hover:text-accent-foreground rounded-md px-1 py-2">
               <ArrowLeft className="h-5 w-5 mr-0 sm:mr-2" />
               Back to Tasks
-            </Button>
+            </Link>
           </div>
           <h2 className="flex-1 text-2xl font-semibold text-center">Profile Settings</h2>
           <div className="w-40" />
         </div>
 
-        
+
 
         <div className="space-y-6 sm:space-y-8">
           {/* Profile Information */}
@@ -235,8 +245,8 @@ export default function Profile() {
               >
                 Send Verification Email
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={saving}
                 className="w-full sm:w-auto order-1 sm:order-2"
               >
