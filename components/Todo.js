@@ -165,9 +165,7 @@ export default function TodoList({ onLogout }) {
         { completed },
         getAuthHeader()
       );
-      setTodos(todos.map(todo =>
-        todo.id === id ? { ...todo, completed } : todo
-      ));
+      fetchTodos();
       toast.success('Task updated successfully');
     } catch (error) {
       refreshTokenIfExpired()
