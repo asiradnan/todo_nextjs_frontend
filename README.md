@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 📝 Todo App (Frontend)
 
-## Getting Started
+A clean, full-featured todo app built with **Next.js**, designed to help users manage tasks efficiently. This is the frontend of a full-stack application with a **FastAPI** backend and also includes an **Android version**.
 
-First, run the development server:
+🔗 **Use the live app:** [todo.asiradnan.com](https://todo.asiradnan.com)
+
+## 🚀 Features
+
+- 🔐 **Authentication** – Secure login and registration for users
+- ✅ **Full CRUD** – Create, read, update, and delete your tasks
+- 📅 **Smart Sorting** – Tasks are automatically sorted by datetime, with the most immediate tasks shown first
+- 🗂️ **Tab-based Filtering** – Easily switch between completed and due tasks
+- 🎨 **Modern UI** – Built with Tailwind CSS, Material UI (MUI), shadcn components, and Lucide React icons
+- 🌐 **REST API Integration** – Communicates with a FastAPI backend
+- 👥 **Multi-user Support** – Each user manages their own todos securely
+- 📱 **Also available on Android**
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js, React
+- **Styling:** Tailwind CSS, Material UI, shadcn, Lucide Icons
+- **Backend:** FastAPI (see link below)
+- **API:** RESTful communication
+- **Deployment:** Self-hosted on private VPS
+
+## 📦 Installation
 
 ```bash
+git clone https://github.com/asiradnan/todo_nextjs_frontend.git
+cd todo_nextjs_frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+The app should be live at `http://localhost:3000`.
+## 🌐 Related Projects
+- 🔙 **Backend (FastAPI):** github.com/asiradnan/todo_fastapi
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- 📱 **Android Version:** Available (repo link can be added here if public)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Made with ❤️ by [Asir Adnan](https://github.com/asiradnan)
