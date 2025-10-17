@@ -1,4 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    output: 'export',
+    basePath: '/todo_nextjs_frontend',
+    assetPrefix: '/todo_nextjs_frontend/',
+    images: {
+        unoptimized: true,
+    },
+};
 
 export default nextConfig;
