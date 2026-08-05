@@ -116,6 +116,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
             <Input
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && editedName) handleSave(); }}
               placeholder="Task name"
               className="transition-all focus:ring-2 focus:ring-primary/20"
             />
