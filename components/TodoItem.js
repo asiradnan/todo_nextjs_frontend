@@ -59,10 +59,10 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               className="h-4 w-4"
             />
             <div className="flex justify-between items-center w-full min-w-0 gap-2">
-              <span className={`truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+              <span className={`truncate text-sm ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
                 {todo.name}
               </span>
-              <span className="text-sm text-muted-foreground text-right shrink-0">
+              <span className="text-xs text-muted-foreground text-right shrink-0">
                 {(() => {
                   if (todo.date != null && todo.time != null) {
                     const d = new Date(todo.date);
