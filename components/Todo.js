@@ -173,7 +173,7 @@ export default function TodoList() {
   const toggleTodo = async (todo, completed) => {
     setActionLoading(true);
     try {
-      await api.put('', { ...todo, completed: completed });
+      await api.put(`${todo.uuid}/`, { ...todo, completed: completed });
       fetchTodos();
       toast.success('Task updated successfully');
     } catch (error) {
