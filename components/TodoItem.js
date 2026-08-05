@@ -58,11 +58,11 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               onClick={(e) => e.stopPropagation()}
               className="h-4 w-4"
             />
-            <div className="flex justify-between items-center w-full">
-              <span className={todo.completed ? 'line-through text-muted-foreground' : ''}>
+            <div className="flex justify-between items-center w-full min-w-0 gap-2">
+              <span className={`truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
                 {todo.name}
               </span>
-              <span className="text-sm text-muted-foreground text-right">
+              <span className="text-sm text-muted-foreground text-right shrink-0">
                 {(() => {
                   if (todo.date != null && todo.time != null) {
                     const d = new Date(todo.date);
@@ -109,7 +109,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
           </div>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-5 shadow-lg rounded-xl">
+      <PopoverContent className="w-[min(400px,calc(100vw-2rem))] p-5 shadow-lg rounded-xl">
         <div className="space-y-5">
           <div className="space-y-3">
             <h3 className="font-medium text-sm">Edit Task</h3>

@@ -252,7 +252,7 @@ export default function TodoList() {
             <TimePickerDemo
               value={dueTime}
               onChange={setDueTime}
-              width='25'
+              width='auto'
             />
           </div>
           <Button type="submit" disabled={actionLoading} className="w-full sm:w-auto">
