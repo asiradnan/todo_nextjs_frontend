@@ -1,95 +1,101 @@
-'use client'
+'use client';
+
 import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, Pencil, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import TimePickerDemo from '@/components/TimePicker.js';
+import DatePicker from '@/components/DatePicker.js';
 
 const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedDescription, setEditedDescription] = useState(todo.description);
-  const [editedDueDate, setEditedDueDate] = useState(todo.due_date || null);
-  const [editedDueTime, setEditedDueTime] = useState(todo.due_time || null);
+  const [editedName, setEditedName] = useState(todo.name);
+  const [editedDate, setEditedDate] = useState(todo.date ? format(new Date(todo.date), "yyyy-MM-dd") : null);
+  const [editedTime, setEditedTime] = useState(todo.time != null ? (() => {
+    const h = Math.floor(todo.time / 3600000);
+    const m = Math.floor((todo.time % 3600000) / 60000);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  })() : null);
 
   const handleSave = () => {
-    onEdit(todo.id, {
-      description: editedDescription,
-      due_date: editedDueDate,
-      due_time: editedDueTime,
-      delete_date: false,
-      delete_time: false
+    let dateMs = null;
+    let timeMs = null;
+
+    if (editedDate) {
+      const d = new Date(editedDate);
+      d.setHours(0, 0, 0, 0);
+      dateMs = d.getTime();
+    }
+
+    if (editedTime) {
+      const [h, m] = editedTime.split(':');
+      timeMs = parseInt(h, 10) * 3600000 + parseInt(m, 10) * 60000;
+    }
+
+    onEdit(todo.uuid, {
+      name: editedName,
+      date: dateMs,
+      time: timeMs
     });
     setIsEditing(false);
   };
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
-  const classDict = {
-    'future': 'text-[#A0A0A0]',
-    'past': 'text-[#606060]',
-}
-  const getDateColor = (dateStr) => {
-    console.log(dateStr);
-    if (todo.completed) return '';
-    if (!dateStr) return classDict.future; 
-    
-    const todoDate = new Date(dateStr);
-    todoDate.setHours(0, 0, 0, 0);
-
-    if (todoDate < today) return classDict.past; 
-    if (todoDate.getTime() === today.getTime()) return ''; 
-    return classDict.future;  
-  };
 
   return (
     <Popover open={isEditing} onOpenChange={setIsEditing}>
       <PopoverTrigger asChild>
-        <div className={`flex items-center justify-between p-2 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer ${getDateColor(todo.due_date)}`}>
+        <div className={`flex items-center justify-between p-2 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer`}>
           <div className="flex items-center gap-3 w-full">
             <Checkbox
               checked={todo.completed}
               onCheckedChange={(checked) => {
-                onToggle(todo.id, checked);
+                onToggle(todo, checked);
                 setIsEditing(false);
               }}
               onClick={(e) => e.stopPropagation()}
               className="h-4 w-4"
             />
             <div className="flex justify-between items-center w-full">
-              <span className={`${todo.completed ? 'line-through text-muted-foreground' : ''}} `}>
-                {todo.description}
+              <span className={todo.completed ? 'line-through text-muted-foreground' : ''}>
+                {todo.name}
               </span>
               <span className="text-sm text-muted-foreground text-right">
                 {(() => {
-                  if (todo.due_date && todo.due_time) {
+                  if (todo.date != null && todo.time != null) {
+                    const d = new Date(todo.date);
+                    const h = Math.floor(todo.time / 3600000);
+                    const m = Math.floor((todo.time % 3600000) / 60000);
+                    const timeDate = new Date(1970, 0, 1, h, m);
                     return (
                       <span>
-                        {new Date(todo.due_date).toLocaleString('en-US', {
+                        {d.toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric'
                         }) + " at " +
-                          new Date('1970-01-01T' + todo.due_time).toLocaleTimeString('en-US', {
+                          timeDate.toLocaleTimeString('en-US', {
                             hour: 'numeric',
                             minute: '2-digit',
                             hour12: true
                           })}
                       </span>
                     );
-                  } else if (todo.due_date) {
+                  } else if (todo.date != null) {
                     return (
                       <span>
-                        {new Date(todo.due_date).toLocaleString('en-US', {
+                        {new Date(todo.date).toLocaleString('en-US', {
                           month: 'short',
                           day: 'numeric'
                         })}
                       </span>
                     );
-                  } else if (todo.due_time) {
-                    return new Date('1970-01-01T' + todo.due_time).toLocaleTimeString('en-US', {
+                  } else if (todo.time != null) {
+                    const h = Math.floor(todo.time / 3600000);
+                    const m = Math.floor((todo.time % 3600000) / 60000);
+                    const timeDate = new Date(1970, 0, 1, h, m);
+                    return timeDate.toLocaleTimeString('en-US', {
                       hour: 'numeric',
                       minute: '2-digit',
                       hour12: true
@@ -108,36 +114,22 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
           <div className="space-y-3">
             <h3 className="font-medium text-sm">Edit Task</h3>
             <Input
-              value={editedDescription}
-              onChange={(e) => setEditedDescription(e.target.value)}
-              placeholder="Task description"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              placeholder="Task name"
               className="transition-all focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <div className="flex gap-3">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`w-[50%] justify-start text-left font-normal hover:border-primary/50 transition-colors ${!editedDueDate && "text-muted-foreground"}`}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {editedDueDate ? format(new Date(editedDueDate), "MMM d") : "Pick date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 shadow-xl" align="start">
-                <Calendar
-                  mode="single"
-                  selected={editedDueDate ? new Date(editedDueDate) : undefined}
-                  onSelect={(date) => setEditedDueDate(date ? format(date, "yyyy-MM-dd") : "")}
-                  initialFocus
-                  className="rounded-lg border-none"
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              value={editedDate}
+              onChange={setEditedDate}
+              className="w-[50%] hover:border-primary/50 transition-colors"
+              placeholder="Pick date"
+            />
             <TimePickerDemo
-              value={editedDueTime}
-              onChange={setEditedDueTime}
+              value={editedTime}
+              onChange={setEditedTime}
               width={"[50%]"}
               className="w-[50%]"
             />
@@ -147,7 +139,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               variant="destructive"
               size="sm"
               onClick={() => {
-                onDelete(todo.id);
+                onDelete(todo.uuid);
                 setIsEditing(false);
               }}
               className="hover:opacity-90 transition-opacity"
@@ -160,7 +152,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={!editedDescription.trim()}
+                disabled={!editedName}
                 className="hover:opacity-90 transition-opacity"
               >
                 Save Changes

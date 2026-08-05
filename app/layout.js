@@ -5,12 +5,12 @@ import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import ThemeToggle from '@/components/ThemeToggle';
-
+import { UserRound } from 'lucide-react';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Todo App',
-  description: 'A beautiful and functional todo list application',
+  title: 'Asir Tasks',
+  description: 'A simple free task management app.',
 };
 
 export default function RootLayout({ children }) {
@@ -23,21 +23,41 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <main className="container mx-auto py-4 px-4 min-h-screen justify-start flex flex-col">
-            <div className="flex justify-between items-center">
-              <Image
-                src="/favicon.ico"
-                alt="Todo App Logo"
-                width={40}
-                height={40}
-                priority
-                className="dark:invert"
-              />
-              <ThemeToggle />
-            </div>
-            {children}
-            <footer className="text-center text-sm mt-4">
-              <Link 
+          <div className="flex flex-col min-h-screen">
+            <header className="container mx-auto py-4 px-4">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src="/checklist.svg"
+                    alt="Checklist Logo"
+                    width={40}
+                    height={40}
+                    priority
+                    className="dark:invert"
+                  />
+                  <h1 className="text-xl tracking-tight">Asir Tasks</h1>
+                </div>
+
+                <nav className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <Link
+                    href="https://accounts.asiradnan.com/users/profile"
+                    target="_blank"
+                    className="p-2 hover:bg-accent hover:text-accent-foreground rounded-full transition-colors flex items-center justify-center"
+                    aria-label="User Profile"
+                  >
+                    <UserRound className="h-6 w-6" />
+                  </Link>
+                </nav>
+              </div>
+            </header>
+
+            <main className="container mx-auto px-4 flex-grow flex flex-col justify-start">
+              {children}
+            </main>
+
+            <footer className="container mx-auto py-6 px-4 text-center text-sm">
+              <Link
                 href="https://github.com/asiradnan/todo_nextjs_frontend"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -58,8 +78,8 @@ export default function RootLayout({ children }) {
                 View on GitHub
               </Link>
             </footer>
-          </main>
-         
+          </div>
+
           <Toaster />
         </ThemeProvider>
       </body>

@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 
 const TimePickerDemo = ({ value, onChange, width }) => {
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState('hours');
   const [period, setPeriod] = useState(() => {
     if (!value) return 'AM';
     return dayjs(`1970-01-01T${value}`).format('A');
@@ -54,7 +55,10 @@ const TimePickerDemo = ({ value, onChange, width }) => {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (newOpen) setView('hours');
+    }}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -69,27 +73,46 @@ const TimePickerDemo = ({ value, onChange, width }) => {
       </PopoverTrigger>
       <PopoverContent className="w-[280px] p-0">
         <div className="p-0">
-          {/* AM/PM Toggle Buttons */}
-          <div className="flex justify-end p-2 gap-1">
-            <Button
-              variant={period === 'AM' ? "default" : "outline"}
-              size="sm"
-              onClick={() => period === 'PM' && togglePeriod()}
-              className="w-12"
-            >
-              AM
-            </Button>
-            <Button
-              variant={period === 'PM' ? "default" : "outline"}
-              size="sm"
-              onClick={() => period === 'AM' && togglePeriod()}
-              className="w-12"
-            >
-              PM
-            </Button>
+          {/* Header */}
+          <div className="flex justify-between items-center p-2 border-b mb-2">
+            <div className="flex gap-1 text-2xl font-bold ml-4">
+               <span 
+                 className={`cursor-pointer transition-colors ${view === 'hours' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                 onClick={() => setView('hours')}
+               >
+                 {value ? dayjs(`1970-01-01T${value}`).format('hh') : '12'}
+               </span>
+               <span className="text-muted-foreground">:</span>
+               <span 
+                 className={`cursor-pointer transition-colors ${view === 'minutes' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                 onClick={() => setView('minutes')}
+               >
+                 {value ? dayjs(`1970-01-01T${value}`).format('mm') : '00'}
+               </span>
+            </div>
+            <div className="flex gap-1 mr-2">
+              <Button
+                variant={period === 'AM' ? "default" : "outline"}
+                size="sm"
+                onClick={() => period === 'PM' && togglePeriod()}
+                className="w-12 h-8"
+              >
+                AM
+              </Button>
+              <Button
+                variant={period === 'PM' ? "default" : "outline"}
+                size="sm"
+                onClick={() => period === 'AM' && togglePeriod()}
+                className="w-12 h-8"
+              >
+                PM
+              </Button>
+            </div>
           </div>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <TimeClock
+              view={view}
+              onViewChange={setView}
               value={getTimeValue()}
               onChange={handleTimeChange}
               ampm
