@@ -1,4 +1,4 @@
-# <img src="./app/icon.svg" alt="Todo Icon" height="32" align="center">Asir Tasks
+# <img src="./public/checklist.png" alt="Asir" height="32" align="center"> Asir Tasks
 
 Web version of Asir Tasks. Built using Next.js and Tailwind CSS. Manage your tasks with due dates, sync across devices (web and android), and switch between light and dark themes.
 
