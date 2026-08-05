@@ -58,7 +58,7 @@ export default function RootLayout({ children }) {
 
             <footer className="container mx-auto py-6 px-4 text-center text-sm">
               <Link
-                href="https://github.com/asiradnan/todo_nextjs_frontend"
+                href="https://github.com/asiradnan/tasks"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
