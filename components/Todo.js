@@ -51,10 +51,37 @@ export default function TodoList() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
+  const lastFetchTime = useRef(Date.now());
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     fetchTodos();
+
+    const handleFocusOrVisible = () => {
+      if (document.visibilityState === 'visible') {
+        const now = Date.now();
+        // Fetch if more than 1 minute has passed since last fetch
+        if (now - lastFetchTime.current > 60000) {
+          fetchTodos();
+        }
+      }
+    };
+
+    // Auto-refresh every 5 minutes if the tab is visible
+    const intervalId = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchTodos();
+      }
+    }, 5 * 60 * 1000);
+
+    document.addEventListener('visibilitychange', handleFocusOrVisible);
+    window.addEventListener('focus', handleFocusOrVisible);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleFocusOrVisible);
+      window.removeEventListener('focus', handleFocusOrVisible);
+    };
   }, []);
 
   const [showNotification, setShowNotification] = useState(false);
@@ -95,6 +122,7 @@ export default function TodoList() {
 
   const fetchTodos = async () => {
     try {
+      lastFetchTime.current = Date.now();
       const response = await api.get();
       setTodos(response.data);
     } catch (error) {
