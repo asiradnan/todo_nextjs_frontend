@@ -5,13 +5,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import TimePickerDemo from '@/components/TimePicker.js';
 import DatePicker from '@/components/DatePicker.js';
 
 const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editedName, setEditedName] = useState(todo.name);
   const [editedDate, setEditedDate] = useState(todo.date ? format(new Date(todo.date), "yyyy-MM-dd") : null);
   const [editedTime, setEditedTime] = useState(todo.time != null ? (() => {
@@ -20,7 +21,7 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
   })() : null);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     let dateMs = null;
     let timeMs = null;
 
@@ -35,11 +36,13 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
       timeMs = parseInt(h, 10) * 3600000 + parseInt(m, 10) * 60000;
     }
 
-    onEdit(todo.uuid, {
+    setIsSaving(true);
+    await onEdit(todo.uuid, {
       name: editedName,
       date: dateMs,
       time: timeMs
     });
+    setIsSaving(false);
     setIsEditing(false);
   };
 
@@ -153,10 +156,11 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={!editedName}
+                disabled={!editedName || isSaving}
                 className="hover:opacity-90 transition-opacity"
               >
-                Save Changes
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </div>
