@@ -113,7 +113,7 @@ export default function TodoList() {
   const completedTodos = useMemo(() => {
     return todos
       .filter(todo => todo.completed)
-      .sort((a, b) => getDueTime(a) - getDueTime(b));
+      .sort((a, b) => getDueTime(b) - getDueTime(a));
   }, [todos]);
 
 
